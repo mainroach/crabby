@@ -1,7 +1,7 @@
 
-# CRABBY #
+<img src="../icon.jpg" width="256" align="right" hspace="20">
 
-<img src="../icon.png" width="400" align="right" hspace="20">
+# CRABBY #
 A texture compression format for spritesheets
 
 ## Why does the encoder only take TGA files? ##

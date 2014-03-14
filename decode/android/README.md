@@ -1,6 +1,6 @@
 
+<img src="../../icon.jpg" width="256" align="right" hspace="20">
 # CRABBY #
-<img src="../../icon.png" width="400" align="right" hspace="20">
 A texture compression format for spritesheets
 
 ## What's gonig on here? ##
