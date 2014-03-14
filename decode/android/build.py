@@ -1,3 +1,18 @@
+'''
+Copyright 2013 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.'''
+
 import os
 import os.path
 import fnmatch
@@ -5,17 +20,7 @@ import shutil
 import sys
 
 '''
-How lame is this? super mega lame.
-It turns out htat each sub-folder must have it's own android.mk file in it.
-Which, besides sucking, also makes it really difficult to maintain over time.
-Sure, there's makefile setups that allow you to read wildcards, but holy hell is that
-undocmented, and hard to keep track of.
-
-So, I wrote a python script to do it for me. Effectivly:
-    src/android/jni/Android.mk is the root .mk file that includes all the other .mk files
-    src/Android.mk is generated from this script to list all the local files in that root.
-
-Would be great to put this all in the base android.mk file, and generate the files directly?
+This is a helper file to do repeated android builds of native code.
 '''
 #======================================
 def giveFiles(mypath):
@@ -89,8 +94,7 @@ if __name__ == "__main__":
     ndkSOName = "native-activity"
     apkName = "./bin/" + projectName + "-debug.apk"
 
-    doFastBuild = False#True
-    
+    doFastBuild = False
     startApp = False
     startLogcat = True
 
@@ -102,7 +106,6 @@ if __name__ == "__main__":
         deleteFolder("./libs/armeabi-v7a")
         deleteFolder("./obj")
   
-
 
     if not os.path.exists("build.xml"):
         os.system("android update project -p . --target android-19")

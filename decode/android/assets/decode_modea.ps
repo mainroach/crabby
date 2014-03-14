@@ -30,11 +30,6 @@ void main( void )
     float deltaBlockIndex=  floor(idxSepr.x*256.0)*256.0 + floor(idxSepr.y*256.0); 
     deltaBlockIndex = floor(deltaBlockIndex );//it's a 16 bit input
     
-    //gl_FragColor = vec4(deltaBlockIndex/512,0,0,1) + vec4(controlUV.x,controlUV.y,0,0);
-
-    //gl_FragColor =  vec4(idxSepr.x,idxSepr.y,0,0);
-    
-    
     
     //WHAT IS THE SOURCE-BLOCK-INDEX
     //given deltaBlockIndex, determine what the right srcPxlIdx is
@@ -56,23 +51,6 @@ void main( void )
     //final color!
     vec4 atlasColor = texture2D( atlasTexture, fac / atlasSizes );
 
-    //gridlines for debugging
-    //float blockScale = ((blocpx.x + blocpx.y) / 6); //to determine if our sub-pixel IDs are correct
-    
-    // Draw a black and white grid.
- //   if(blocpx.x ==0 || blocpx.y ==0) 
-    {
-   //     gl_FragColor = atlasColor * vec4(0.75,0.75,0.75,1);
-    }
-   // else
-    {
-        gl_FragColor = atlasColor;//*blockScale;
-    }
-    
+    gl_FragColor = atlasColor;
 
-    
-    
-    
-
-    
 }
