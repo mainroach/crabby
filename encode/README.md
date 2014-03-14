@@ -1,10 +1,11 @@
 
 # CRABBY #
-![alt text](./icon.png "Logo Title Text 1")
+
+<img src="../icon.png" width="400" align="right" hspace="20">
 A texture compression format for spritesheets
 
 ## Why does the encoder only take TGA files? ##
-Simply to simplify distribution.
+Simply to simplify distribution. The code gets more complex when you start adding libraries for JPG and PNG processing.
 
 
 ## Building the encoder ##

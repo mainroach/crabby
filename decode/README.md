@@ -1,6 +1,6 @@
 
 # CRABBY #
-![alt text](./icon.png "Logo Title Text 1")
+<img src="../icon.png" width="400" align="right" hspace="20">
 A texture compression format for spritesheets
 
 ## What's gonig on here? ##

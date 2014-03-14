@@ -1,7 +1,7 @@
 
 
 # CRABBY #
-![alt text](./icon.png "Logo Title Text 1")
+<img src="./icon.png" width="400" align="right" hspace="20">
 A texture compression format for spritesheets
 
 ## What is Crabby? ##
@@ -18,9 +18,4 @@ Crabby represents a work in progress to find alternate ways to compress sprite s
 
 ## How does Crabby work? ##
 **Crabby works by finding removing duplicate 4x4 blocks of pixels from an atlas image.** Spritesheets tend to have lots of blank space, in addition to lots of duplicated color structure. Crabby search all the input textures provided, will list all the unique blocks in a single 'pallete texture' image. For each image provided, Crabby will output a 'frame' texture that references, in raster scan order, what 4x4 pixel block should go there. 
-
-
-## Running the encoder ##
-encode.exe in-textures/crab/imglist.txt out-textures/crab
-
 
