@@ -1,0 +1,78 @@
+precision highp float; 
+varying vec3 v_color;
+varying vec2 v_texCoord;
+
+uniform sampler2D atlasTexture;
+uniform sampler2D framesTexture;
+
+uniform vec4 constants; // cBlockSize,256/cBlockSize,gFlipObj.frames[frameCounter].minPalleteLocation,gFlipObj.frames[frameCounter].escapeBlockIndex);
+uniform vec4 frameData; //frame.offsetX, frame.offsetY, frame.rcpWidth, frame.rcpHeight
+uniform vec4 atlasData; //frame.imgWidth,frame.imgHeight, pallete.width,pallete.height
+void main( void )
+{
+    //consts
+    float cBlockSize = floor(constants.x);
+    float cMaxBlocksWidth= constants.y;
+
+    //per flipbook, computed on CPU
+    float minPalleteOffset = floor(constants.z);
+    vec2 frameSize = atlasData.xy;
+    vec2 atlasSizes = atlasData.zw;
+
+    //compute what our pixel is, and what pixel-block index we fall into
+    vec2 pixel=vec2(v_texCoord.x * frameSize.x, (1.0-v_texCoord.y) * frameSize.y);
+
+    //scale the input UV data by the width/height of this frame, and then offset it as well
+    vec2 controlUV = vec2(v_texCoord.x * frameData.z + frameData.x,
+                            (1.0-v_texCoord.y) * frameData.w + frameData.y);
+
+    vec2 idxSepr = texture2D( framesTexture, controlUV ).ab;
+    float deltaBlockIndex=  floor(idxSepr.x*256.0)*256.0 + floor(idxSepr.y*256.0); 
+    deltaBlockIndex = floor(deltaBlockIndex );//it's a 16 bit input
+    
+    //gl_FragColor = vec4(deltaBlockIndex/512,0,0,1) + vec4(controlUV.x,controlUV.y,0,0);
+
+    //gl_FragColor =  vec4(idxSepr.x,idxSepr.y,0,0);
+    
+    
+    
+    //WHAT IS THE SOURCE-BLOCK-INDEX
+    //given deltaBlockIndex, determine what the right srcPxlIdx is
+    
+    vec2 bloc = vec2(   floor(mod(deltaBlockIndex , cMaxBlocksWidth)), 
+                        floor(deltaBlockIndex / cMaxBlocksWidth)
+                    );
+    vec2 blocpx = vec2(floor(mod(pixel.x , cBlockSize)), 
+                        floor(mod(pixel.y , cBlockSize))
+                        ); //confirmed legit
+    bloc = bloc * cBlockSize; //scale back up
+    
+    //CLM we need to adjust the center sampling of the pixel to match the atlas size
+    vec2 centerOffsets = vec2((1.0 / atlasData.z),(1.0 / atlasData.w));
+    centerOffsets += centerOffsets*0.5;
+    vec2 fac = blocpx+bloc + centerOffsets;
+                
+    
+    //final color!
+    vec4 atlasColor = texture2D( atlasTexture, fac / atlasSizes );
+
+    //gridlines for debugging
+    //float blockScale = ((blocpx.x + blocpx.y) / 6); //to determine if our sub-pixel IDs are correct
+    
+    // Draw a black and white grid.
+ //   if(blocpx.x ==0 || blocpx.y ==0) 
+    {
+   //     gl_FragColor = atlasColor * vec4(0.75,0.75,0.75,1);
+    }
+   // else
+    {
+        gl_FragColor = atlasColor;//*blockScale;
+    }
+    
+
+    
+    
+    
+
+    
+}
