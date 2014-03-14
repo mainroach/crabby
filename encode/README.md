@@ -1,5 +1,5 @@
 
-<img src="../icon.jpg" width="256" align="right" hspace="20">
+<img src="https://github.com/mainroach/crabby/blob/master/icon.jpg" width="256" align="right" hspace="20">
 
 # CRABBY #
 A texture compression format for spritesheets
