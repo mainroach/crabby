@@ -58,7 +58,18 @@ While these formats create great compression savings for distribution, they ofte
 <h2>
 <a name="how-does-crabby-work" class="anchor" href="#how-does-crabby-work"><span class="octicon octicon-link"></span></a>How does Crabby work?</h2>
 
-<p><strong>Crabby works by finding removing duplicate 4x4 blocks of pixels from an atlas image.</strong> Spritesheets tend to have lots of blank space, in addition to lots of duplicated color structure. Crabby search all the input textures provided, will list all the unique blocks in a single 'pallete texture' image. For each image provided, Crabby will output a 'frame' texture that references, in raster scan order, what 4x4 pixel block should go there. </p>
+<p><strong>Crabby works by finding removing duplicate 4x4 blocks of pixels from an atlas image.</strong> Spritesheets tend to have lots of blank space, in addition to lots of duplicated color structure. Crabby search all the input textures provided, will list all the unique blocks in a single 'pallete texture' image. For each image provided, Crabby will output a 'frame' texture that references, in raster scan order, what 4x4 pixel block should go there. For more information, you can see a <a href="https://docs.google.com/document/d/1cnBuCWvflUUAM70mGelCp7upVXwwWNw7zh_s0B5-6F4/edit?usp=sharing">document covering the algorithms in more detail</a>.</p>
+
+<h2>
+<a name="what-type-of-compression-savings-does-crabby-provide" class="anchor" href="#what-type-of-compression-savings-does-crabby-provide"><span class="octicon octicon-link"></span></a>What type of compression savings does Crabby provide?</h2>
+
+<p>The compression performance of Crabby is based entirely on how much duplicate 4x4 pixel blocks can be removed from a sprite sheet. For some examples, you can view the running <a href="https://docs.google.com/document/d/1Zvn98TA5QRZIf6lZ5HqrHrBWJi7zkeo9UWIruJuUqdc/edit">results document</a> for a rough idea of what types of images do well with Crabby.</p>
+
+<h2>
+<a name="what-type-of-performance-hit-does-crabby-cause" class="anchor" href="#what-type-of-performance-hit-does-crabby-cause"><span class="octicon octicon-link"></span></a>What type of performance hit does Crabby cause?</h2>
+
+<p>This entirely depends on your GPU. 
+<a href="https://docs.google.com/document/d/1Zvn98TA5QRZIf6lZ5HqrHrBWJi7zkeo9UWIruJuUqdc/edit">results document</a> will contain more benchmark tests as they are run and provided.</p>
         </section>
 
         <footer>
