@@ -51,7 +51,7 @@ bool loadTGAFile(const char* pFilename, ImageData& id)
 	
 	if(header.datatypecode != 2 && header.datatypecode != 3)
 	{
-		printf("Sorry bro, tga format not supported");
+		printf("Sorry, this specific tga format not supported");
 		fclose(fi);
 		return false;
 	}
@@ -113,6 +113,26 @@ bool loadTGAFile(const char* pFilename, ImageData& id)
 	}
 
 	fclose(fi);
+    
+    // last thing, we expect RGBA output from this load function. Does the input texture conform to this?
+    if(bytesPerPixel==3)
+    {
+        fprintf(stderr,"Input TGA is RGB, converting to RGBA\n");
+        char* rgba = new char[id.width * id.height * 4];
+        //copy each RGB value to RGBA
+        const int numPix = id.width * id.height;
+        for(unsigned int i = 0; i < numPix; i++)
+        {
+            rgba[(i*4)+0] = id.pImgData[(i*3)+0];
+            rgba[(i*4)+1] = id.pImgData[(i*3)+1];
+            rgba[(i*4)+2] = id.pImgData[(i*3)+2];
+            rgba[(i*4)+3] = 0xFF;
+        }
+        
+        delete[] id.pImgData;
+        id.pImgData = rgba;
+
+    }
 
 	return true;
 }

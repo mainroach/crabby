@@ -237,11 +237,11 @@ void writeBlockPallete(std::string outPrefix, std::vector<Block>& blockPool,uint
 
     //write to disk
 	 char outPath[1024];
-	 sprintf(outPath,"%s_blockatlas.raw",outPrefix.c_str());
-	 //saveTGA(&outPath[0],pAtlas,outWidth,outHeight);
-	 FILE* pOut = fopen(&outPath[0],"wb");
-    fwrite(pAtlas,sizeof(RGBAColor)*outWidth*outHeight,1,pOut);
-    fclose(pOut);
+	 sprintf(outPath,"%s_blockatlas.tga",outPrefix.c_str());
+	 saveTGA(&outPath[0],pAtlas,outWidth,outHeight);
+	 //FILE* pOut = fopen(&outPath[0],"wb");
+    //fwrite(pAtlas,sizeof(RGBAColor)*outWidth*outHeight,1,pOut);
+    //fclose(pOut);
     
     
     //print out data, just to be sane.
