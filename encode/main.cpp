@@ -35,9 +35,9 @@ static int error(const char* pMsg, ...)
    va_list args;
    va_start(args, pMsg);
    char buf[512];
-   vsprintf_s(buf, sizeof(buf), pMsg, args);
+   vsprintf(buf, pMsg, args);
    va_end(args);
-   printf("%s", buf);
+   fprintf(stderr,"%s", buf);
    return EXIT_FAILURE;
 }
 
@@ -74,7 +74,7 @@ static bool readFileIntoMemory(const char* pFilename, unsigned int& dataSize, ch
 //-----------------------------------
 int main(int argc, char *argv[])
 {
-	printf("CRABBY - Version Built " __DATE__ ", " __TIME__ "\n");
+	fprintf(stderr,"CRABBY - Version Built " __DATE__ ", " __TIME__ "\n");
 	
 	if (argc < 3)
 	{

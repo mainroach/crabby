@@ -263,8 +263,7 @@ void writeMetaDataBinary(std::string outPrefix,  const eCompressionMode compress
     
 	char outPath[1024];
 	 sprintf(outPath,"%s_metadata.dat",outPrefix.c_str());
-    FILE* pFile = 0;
-	 fopen_s(&pFile,&outPath[0],"wb");
+    FILE* pFile = fopen(&outPath[0],"wb");
 
     //compression mode
     fwrite(&compressionMode,1,1,pFile);

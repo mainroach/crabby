@@ -34,15 +34,16 @@ struct TGAHeader {
 
 bool loadTGAFile(const char* pFilename, ImageData& id)
 {
-	FILE* fi = NULL;
-	fopen_s(&fi,pFilename,"rb");
+    memset(&id,0,sizeof(ImageData));
+
+	FILE* fi = fopen(pFilename,"rb");
 	
 	//note the spec : http://www.paulbourke.net/dataformats/tga/
 
 	if(fi == 0)
 	{
 		printf("Couldn't load file");
-		return -1;
+		return false;
 	}
 	// header
 	TGAHeader header;
