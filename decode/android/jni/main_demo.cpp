@@ -16,9 +16,8 @@ See the License for the specific language governing permissions and
 #include <sys/stat.h>
 #include <vector>
 #include <assert.h>
-
 #include "platform.h"
-
+#include "imghelper.h"
 
  AAssetManager* gAndroidAM;
 
@@ -248,8 +247,14 @@ void demo_loadFlipbook(flipbookObj* pObj, const char* fileprefix)
 	//load blockatlas
 	int glErrorCode=  0;
 	unsigned int fileSize = 0;
-	sprintf(fname,"%s_blockatlas.raw",fileprefix);
-	unsigned char* pBlockAtlas =readWholeFile(&fname[0],fileSize);
+	sprintf(fname,"%s_blockatlas.tga",fileprefix);
+	ImageData id;
+	if(!loadTGAFile(&fname[0], id,gAndroidAM) )
+	{
+		LOGE("Error loading blockatlas.tga file");
+		return;
+	}
+	unsigned char* pBlockAtlas = (unsigned char*)id.pImgData;//readWholeFile(&fname[0],fileSize);
 	
 	 glGenTextures( 1, &pObj->atlasTextureHandle);
     glBindTexture( GL_TEXTURE_2D, pObj->atlasTextureHandle);
@@ -324,7 +329,6 @@ void demo_initShader( void )
     
 	if(gFlipObj.compressionMode==0) //modeb
 		fragmentShaderStrings[0] = (char*)readWholeFile(cPathToPSA,fileSize);
-	LOGW("%s",fragmentShaderStrings[0]);
 	
 
    glShaderSource( g_fragmentShader, 1, fragmentShaderStrings, NULL );
