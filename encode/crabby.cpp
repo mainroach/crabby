@@ -201,7 +201,7 @@ void writeControlAtlas(std::string outPrefix,std::vector<ControlFrame>& frames, 
     delete[] pAtlas;
 }
 //----------------------------------------------
-void writeBlockPallete(std::string outPrefix, std::vector<Block>& blockPool,uint32& numBlocks, uint32& imgDeltaWidth, uint32& imgDeltaHeight)
+void writeBlockPallete(std::string outPrefix, std::vector<Block>& blockPool,uint32& numBlocks, uint32& imgDeltaWidth, uint32& imgDeltaHeight, const eOutputImageMode imageMode)
 {
     // This function will write our our RGBA blocks in a pallet form.
     
@@ -237,11 +237,19 @@ void writeBlockPallete(std::string outPrefix, std::vector<Block>& blockPool,uint
 
     //write to disk
 	 char outPath[1024];
-	 sprintf(outPath,"%s_blockatlas.tga",outPrefix.c_str());
-	 saveTGA(&outPath[0],pAtlas,outWidth,outHeight);
-	 //FILE* pOut = fopen(&outPath[0],"wb");
-    //fwrite(pAtlas,sizeof(RGBAColor)*outWidth*outHeight,1,pOut);
-    //fclose(pOut);
+	 if(imageMode == eImageMode_Tga)
+	 {
+		 sprintf(outPath,"%s_blockatlas.tga",outPrefix.c_str());
+		 saveTGA(&outPath[0],pAtlas,outWidth,outHeight);
+	 }
+	 else if(imageMode == eImageMode_Raw)
+	 {
+		 sprintf(outPath,"%s_blockatlas.raw",outPrefix.c_str());
+		FILE* pOut = fopen(&outPath[0],"wb");
+		fwrite(pAtlas,sizeof(RGBAColor)*outWidth*outHeight,1,pOut);
+		fclose(pOut);
+	 }
+	 
     
     
     //print out data, just to be sane.
@@ -491,7 +499,7 @@ int compressFramesModeA(std::vector<std::string>& filenames, std::vector<Block>&
 }
 
 //----------------------------------------------
-void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix, const eCompressionMode compressionMode, const eOutputMetaDataMode outputMode)
+void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix, const eCompressionMode compressionMode, const eOutputMetaDataMode outputMode, const eOutputImageMode imageMode)
 {
 	uint32 numBlocks=0;
 	uint32 imgDeltaWidth=0;
@@ -514,7 +522,7 @@ void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix
 	// The control atlas: Per frame, per block in-frame, writeout the index of the desired block.
    writeControlAtlas(outPrefix, frames,controlAtlasWidth,controlAtlasHeight);
 	// Block pallet is the unique set of blocks used by this image, stored in RGBA8
-   writeBlockPallete(outPrefix, globalBlockPool,numBlocks,imgDeltaWidth,imgDeltaHeight);
+   writeBlockPallete(outPrefix, globalBlockPool,numBlocks,imgDeltaWidth,imgDeltaHeight, imageMode);
 	// The metadata binary contains information on where the frames are, and how to render them
 	if(outputMode == eMetaMode_Binary)
 		writeMetaDataBinary(outPrefix, compressionMode, frames, imgDeltaWidth, imgDeltaHeight, controlAtlasWidth,controlAtlasHeight);

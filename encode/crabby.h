@@ -66,6 +66,11 @@ enum eOutputMetaDataMode
 	eMetaMode_JSON,
 };
 
+enum eOutputImageMode
+{
+	eImageMode_Tga =0,
+	eImageMode_Raw,
+};
 
 
 // We allow the texture to be broken up into 4x4 blocks, this is simply a helper class to facilitate that.
@@ -74,6 +79,9 @@ struct Block
     RGBAColor pixels[16]; //assumes 4x4 pixels, raster order
 };
 
-void compressFlipbook(std::vector<std::string>& filenameList, std::string outPrefix,const eCompressionMode compressionMode, const eOutputMetaDataMode outputMode);
+void compressFlipbook(std::vector<std::string>& filenameList, std::string outPrefix,
+							 const eCompressionMode compressionMode, 
+							 const eOutputMetaDataMode outputMode,
+							 const eOutputImageMode imageMode);
 
 

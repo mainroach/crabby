@@ -27,6 +27,13 @@ static int print_usage()
 {
    printf("Description: Crabby.\n");
    printf("Usage: encode.exe txtfilename outfileprefix <options>\n");
+	printf("Options:\n");
+	printf("\t\t -JSON \t\t Output metadata in .JSON format\n");
+	printf("\t\t -DAT \t\t Output metadata in binary .DAT format\n");
+
+	printf("\t\t -block_tga \t\t Output block palette in .tga format\n");
+	printf("\t\t -block_raw \t\t Output block palette in .raw format\n");
+
    return EXIT_FAILURE;
 }
 //-----------------------------------
@@ -87,6 +94,7 @@ int main(int argc, char *argv[])
 
 	eCompressionMode comprMode = cMode_A;
 	eOutputMetaDataMode metaOutputMode =eMetaMode_Binary;
+	eOutputImageMode outImageMode = eImageMode_Tga;
 
 	if(argc >2)
 	{
@@ -95,6 +103,14 @@ int main(int argc, char *argv[])
 			if(!stricmp("-JSON",argv[i]))
 			{
 				metaOutputMode=eMetaMode_JSON;
+			}
+			else if(!stricmp("-block_tga",argv[i]))
+			{
+				outImageMode=eImageMode_Tga;
+			}
+			else if(!stricmp("-block_raw",argv[i]))
+			{
+				outImageMode=eImageMode_Raw;
 			}
 		}
 	}
@@ -127,7 +143,7 @@ int main(int argc, char *argv[])
 	delete[] pFileDat;
 
 	
-	compressFlipbook(images,outFile, comprMode, metaOutputMode);
+	compressFlipbook(images,outFile, comprMode, metaOutputMode, outImageMode);
 
 
 	
