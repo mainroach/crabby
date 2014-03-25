@@ -1,0 +1,519 @@
+
+<html>
+
+<head>
+<title>Learning WebGL &mdash; lesson 1</title>
+<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+
+<script id="shader-fs" type="x-shader/x-fragment">
+    precision highp float; 
+    varying vec3 v_color;
+    varying vec2 v_texCoord;
+
+    uniform sampler2D atlasTexture;
+    uniform sampler2D framesTexture;
+
+    uniform vec4 constants; // cBlockSize,256/cBlockSize,gFlipObj.frames[frameCounter].minPalleteLocation,gFlipObj.frames[frameCounter].escapeBlockIndex);
+    uniform vec4 frameData; //frame.offsetX, frame.offsetY, frame.rcpWidth, frame.rcpHeight
+    uniform vec4 atlasData; //frame.imgWidth,frame.imgHeight, pallete.width,pallete.height
+    void main( void )
+    {
+        //consts
+        float cBlockSize = floor(constants.x);
+        float cMaxBlocksWidth= constants.y;
+
+        //per flipbook, computed on CPU
+        float minPalleteOffset = floor(constants.z);
+        vec2 frameSize = atlasData.xy;
+        vec2 atlasSizes = atlasData.zw;
+
+        //compute what our pixel is, and what pixel-block index we fall into
+        vec2 pixel=vec2(v_texCoord.x * frameSize.x, (1.0-v_texCoord.y) * frameSize.y);
+
+        //scale the input UV data by the width/height of this frame, and then offset it as well
+        vec2 controlUV = vec2(v_texCoord.x * frameData.z + frameData.x,
+                                (1.0-v_texCoord.y) * frameData.w + frameData.y);
+
+        vec2 idxSepr = texture2D( framesTexture, controlUV ).ab;
+        float deltaBlockIndex=  floor(idxSepr.x*256.0)*256.0 + floor(idxSepr.y*256.0); 
+        deltaBlockIndex = floor(deltaBlockIndex );//it's a 16 bit input
+        
+       
+        
+        //WHAT IS THE SOURCE-BLOCK-INDEX
+        //given deltaBlockIndex, determine what the right srcPxlIdx is
+        
+        vec2 bloc = vec2(   floor(mod(deltaBlockIndex , cMaxBlocksWidth)), 
+                            floor(deltaBlockIndex / cMaxBlocksWidth)
+                        );
+        vec2 blocpx = vec2(floor(mod(pixel.x , cBlockSize)), 
+                            floor(mod(pixel.y , cBlockSize))
+                            ); //confirmed legit
+        bloc = bloc * cBlockSize; //scale back up
+        
+        //CLM we need to adjust the center sampling of the pixel to match the atlas size
+        vec2 centerOffsets = vec2((1.0 / atlasData.z),(1.0 / atlasData.w));
+        centerOffsets += centerOffsets*0.5;
+        vec2 fac = blocpx+bloc + centerOffsets;
+                    
+        
+        //final color!
+        vec4 atlasColor = texture2D( atlasTexture, fac / atlasSizes );
+
+        gl_FragColor = atlasColor;
+        
+
+    }
+
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    uniform mat4 a_MVP;
+    attribute vec2 a_texCoord; 
+    attribute vec3 a_color; 
+    attribute vec4 a_position; 
+    varying  vec3 v_color; 
+    varying  vec2 v_texCoord; 
+
+    void main(void) {
+         gl_Position = a_MVP * a_position;
+        v_texCoord = a_texCoord;
+        v_color = a_color;
+    }
+    //precision mediump float; 
+
+</script>
+
+<script>
+         window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+
+    function checkWait(conditionFunction, resultFunction)
+        {
+            var tev = setInterval(function()
+                {
+                    if(conditionFunction())
+                    {
+                        resultFunction(); 
+                        clearInterval(tev)
+                    }
+                }, 100);
+        }
+    //---------------------------------
+    function xhrGet(reqUri,isBinary,callback)
+    {
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", reqUri, true);
+    
+        if(isBinary)
+            xhr.responseType = 'arraybuffer';
+        else
+            xhr.overrideMimeType('text/plain; charset=x-user-defined');
+
+
+
+        xhr.onreadystatechange = function() 
+        {
+          if (xhr.readyState == 4)
+          {
+            if(callback != null)
+                callback(xhr);
+          }
+        };
+        xhr.withCredentials = "false";
+        xhr.send();
+    }
+    </script>
+
+<script type="text/javascript">
+
+    var gl;
+    var shaderProgram;
+    var gMVP=new Array(16);
+    var numSteps=1;
+
+  
+    //---------------------------------
+    
+    function initGL(canvas) {
+        try {
+            gl = canvas.getContext("experimental-webgl");
+            gl.viewportWidth = canvas.width;
+            gl.viewportHeight = canvas.height;
+        } catch (e) {
+        }
+        if (!gl) {
+            alert("Could not initialise WebGL, sorry :-(");
+        }
+    }
+    //---------------------------------
+
+    function getShader(gl, id) {
+        var shaderScript = document.getElementById(id);
+        if (!shaderScript) {
+            return null;
+        }
+
+        var str = "";
+        var k = shaderScript.firstChild;
+        while (k) {
+            if (k.nodeType == 3) {
+                str += k.textContent;
+            }
+            k = k.nextSibling;
+        }
+
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+            shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+            shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+            return null;
+        }
+
+        gl.shaderSource(shader, str);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            alert(gl.getShaderInfoLog(shader));
+            return null;
+        }
+
+        return shader;
+    }
+    //---------------------------------
+    function flipbookObj(){
+        this.meta = null;
+
+
+        this.atlasTextureHandleDOM;
+        this.atlasTextureHandle = null;
+        this.framesTextureHandle = null;
+
+        this.frames = new Array();
+        this.currentFrame = 0;
+     };
+
+     var gFlipObj = new flipbookObj();
+     //---------------------------------
+     var loadedCount=0;
+     function loadMetaData()
+     {
+         xhrGet("./crab_metadata.json", false,function(data)
+        {
+            gFlipObj.meta = JSON.parse( data.response );
+
+            loadedCount++;
+        });
+     }
+
+     function loadBlockAtlas()
+     {
+        //load palette image
+        xhrGet("./crab_blockatlas.raw", true,function(data)
+            {
+                gFlipObj.atlasTextureHandle = gl.createTexture();
+                gl.bindTexture(gl.TEXTURE_2D, gFlipObj.atlasTextureHandle);
+                //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+                
+                //note you have to set the min/mag filter here. otherwise nothing works.
+                gl.texParameteri( gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+                gl.texParameteri( gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+                //REQUIRED IN GLES2 FOR NPOT TEXTURES
+                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+                 
+                gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gFlipObj.meta.palleteWidth, gFlipObj.meta.palleteHeight, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(data.response));
+
+                loadedCount++;
+            });
+     }
+
+     function loadFrameData()
+     {
+        xhrGet("./crab_frames.raw", true,function(data)
+            {
+                //gMap.parseMapJSON(data.response);
+                gFlipObj.framesTextureHandle = gl.createTexture();
+                gl.bindTexture( gl.TEXTURE_2D, gFlipObj.framesTextureHandle );
+
+                //note you have to set the min/mag filter here. otherwise nothing works.
+                gl.texParameteri( gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER, gl.NEAREST );
+                gl.texParameteri( gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER, gl.NEAREST );
+
+                //REQUIRED IN GLES2 FOR NPOT TEXTURES
+                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                 gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+
+                 //if compression mode is 0, then we're 16bpp for the frames texture
+                gl.texImage2D( gl.TEXTURE_2D, 0, gl.LUMINANCE_ALPHA, gFlipObj.meta.frameTexWidth, gFlipObj.meta.frameTexHeight, 0, gl.LUMINANCE_ALPHA, gl.UNSIGNED_BYTE, new Uint8Array(data.response));
+
+                loadedCount++;
+            });
+     }
+
+    function loadTextures()
+    {
+
+        loadMetaData();
+     
+
+        checkWait(
+            function() {return loadedCount==1;}, 
+            function() {loadBlockAtlas();});
+        checkWait(
+            function() {return loadedCount==2;}, 
+            function() {loadFrameData();});
+    }
+    //---------------------------------
+    function initShaders() 
+    {
+        var fragmentShader = getShader(gl, "shader-fs");
+        var vertexShader = getShader(gl, "shader-vs");
+
+        shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            alert("Could not initialise shaders");
+        }
+
+        gl.useProgram(shaderProgram);
+
+        shaderProgram.g_location_positionLoc = gl.getAttribLocation(shaderProgram, "a_position" );
+        shaderProgram.g_location_colorLoc    = gl.getAttribLocation(shaderProgram, "a_color" );
+        shaderProgram.g_location_texCoordLoc = gl.getAttribLocation(shaderProgram, "a_texCoord" );
+        
+
+
+        shaderProgram.atlasTextureLoc = gl.getUniformLocation(shaderProgram, "atlasTexture");
+        shaderProgram.framesTextureLoc = gl.getUniformLocation(shaderProgram, "framesTexture");
+        shaderProgram.shaderParamsLoc = gl.getUniformLocation(shaderProgram, "params");
+
+        shaderProgram.constantsVec4Loc = gl.getUniformLocation(shaderProgram, "constants");
+        shaderProgram.frameDataVec4Loc = gl.getUniformLocation(shaderProgram, "frameData");
+        shaderProgram.atlasDataVec4Loc = gl.getUniformLocation(shaderProgram, "atlasData");
+
+        shaderProgram.mvpLoc = gl.getUniformLocation(shaderProgram, "a_MVP");
+    }
+    //---------------------------------
+
+   
+    //-----------------------------------------------------------------------------
+    function mulMat4( destMat, srcMat)
+    {
+        var tmpSrc = new Array(16);
+        var ctr=0;
+        for ( var i=0; i<4; i++ )
+        {
+            for ( var j=0; j<4; j++ )
+            {
+                var   tmp = 0.0;
+                for ( var k=0; k<4; k++ )
+                    tmp += destMat[i*4+k] * srcMat[k*4+j];
+                
+                tmpSrc[ctr] = tmp;
+                ctr+=1;
+            }
+        }
+
+        for(var i =0; i < 16; i++)
+            destMat[i] = tmpSrc[i];
+    }
+    //-----------------------------------------------------------------------------
+    function identityMVP()
+    {
+        for(var i =0; i < 16; i++)
+            gMVP[i] =0;
+
+        gMVP[0] = 1.0;
+        gMVP[5] = 1.0;
+        gMVP[10] = 1.0;
+        gMVP[15] = 1.0;
+    }
+    //-----------------------------------------------------------------------------
+    function scaleMVP(  sx,  sy,  sz)
+    {
+        var scaleMat = new Array(16);
+         for(var i =0; i < 16; i++)
+            scaleMat[i] =0;
+
+        scaleMat[0] = sx;
+        scaleMat[5] = sy;
+        scaleMat[10] = sz;
+        scaleMat[15] = 1.0;
+
+        mulMat4(gMVP,scaleMat);
+        
+    }
+    //-----------------------------------------------------------------------------
+    function translateMVP( tx,   ty,   tz)
+    {
+        var trans=[1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1];
+        
+        trans[12] = tx;
+        trans[13] = ty;
+        trans[14] = tz;
+        trans[15] = 1;
+
+        mulMat4(gMVP,trans);
+    }
+    //---------------------------------
+    var g_vboID;
+    var g_ibID;
+
+    function initBuffers() {
+
+        g_vboID = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, g_vboID);
+        vertices = [
+            0.0,0.0,  1.0,1.0,0.0, -1.0,-1.0, 0.0,
+            1.0,0.0,  1.0,0.0,0.0,  1.0,-1.0, 0.0 ,
+            1.0,1.0,  0.0,1.0,0.0,  1.0, 1.0, 0.0 ,
+            0.0,1.0,  0.0,0.0,1.0, -1.0, 1.0, 0.0 
+        ];
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+        g_vboID.itemSize = 8;
+        g_vboID.numItems = 4;
+
+        g_ibID = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, g_ibID);
+        inds = [ 0, 1, 2, 0, 2, 3 ];
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Int8Array(inds), gl.STATIC_DRAW);
+        g_ibID.itemSize = 1;
+        g_ibID.numItems = 6;
+    }
+
+    //-----------------------------------------------------------------------------
+    function drawQuad()
+    {
+        //draw a single quad. This is stupidly complex for ogl
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, g_vboID);
+       
+        gl.vertexAttribPointer(shaderProgram.g_location_positionLoc, 3, gl.FLOAT, false, 32, 4 * 5);
+        gl.enableVertexAttribArray(shaderProgram.g_location_positionLoc);
+        gl.vertexAttribPointer(shaderProgram.g_location_texCoordLoc, 2, gl.FLOAT, false, 32, 0);
+        gl.enableVertexAttribArray(shaderProgram.g_location_texCoordLoc);
+        gl.vertexAttribPointer(shaderProgram.g_location_colorLoc, 3, gl.FLOAT, false, 32, 4 * 2);
+        gl.enableVertexAttribArray(shaderProgram.g_location_colorLoc);
+        
+
+
+        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, g_ibID);
+        
+        gl.drawElements ( gl.TRIANGLES, 6,  gl.UNSIGNED_BYTE ,0 );
+
+    }
+    //-----------------------------------------------------------------------------
+    function drawScene() 
+    {
+        if(loadedCount!=3)
+        {
+            requestAnimFrame( drawScene );
+            return;
+        }
+
+        gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+
+        //set what program we're using
+       gl.useProgram( shaderProgram );
+        
+        //atlas texture
+        gl.activeTexture(gl.TEXTURE0 + 0);   
+        gl.bindTexture(gl.TEXTURE_2D, gFlipObj.atlasTextureHandle);
+        gl.uniform1i( shaderProgram.atlasTextureLoc, 0 );
+        
+
+        //frames texture
+        gl.activeTexture(gl.TEXTURE0 + 1);   
+        gl.bindTexture(gl.TEXTURE_2D, gFlipObj.framesTextureHandle);
+        gl.uniform1i( shaderProgram.framesTextureLoc, 1 );
+
+        //set the params
+        var frameCounter = gFlipObj.currentFrame;
+        var cBlockSize = gFlipObj.meta.blockSize;
+        gl.uniform4f(shaderProgram.constantsVec4Loc, cBlockSize,256/cBlockSize,0,0);
+        gl.uniform4f(shaderProgram.frameDataVec4Loc,   gFlipObj.meta.frames[frameCounter].xOffset,
+                                                    gFlipObj.meta.frames[frameCounter].yOffset,
+                                                    gFlipObj.meta.frames[frameCounter].widthScale,
+                                                    gFlipObj.meta.frames[frameCounter].heightScale);
+        
+        gl.uniform4f(shaderProgram.atlasDataVec4Loc,   gFlipObj.meta.frames[frameCounter].srcImgWidth,
+                                                    gFlipObj.meta.frames[frameCounter].srcImgHeight,
+                                                    gFlipObj.meta.palleteWidth,
+                                                    gFlipObj.meta.palleteHeight);
+
+        //now, draw MxN quads on the screen with this technique, to show off how fast it is.
+        var modifier = 2.0 / numSteps;
+        var startOffs = -1+(modifier*0.5);
+        for(var y = 0; y < numSteps; y++)
+        {
+            for(var x = 0; x < numSteps; x++)
+            {
+                identityMVP();
+                scaleMVP(1.0/numSteps,1.0/numSteps,1);
+                //scaleMVP(0.25,0.25,1);
+                translateMVP( startOffs + (x*modifier), startOffs + (y*modifier), 0.0 );
+                
+                gl.uniformMatrix4fv( shaderProgram.mvpLoc, gl.FALSE, gMVP );
+
+                drawQuad();
+            }
+        }
+
+        //increase our frame. In reality, we'd want to scale this by whatever the framerate is for this animation
+        gFlipObj.currentFrame = (gFlipObj.currentFrame+1) % gFlipObj.meta.numFrames;
+
+        requestAnimFrame( drawScene );
+    }
+    //-----------------------------------------------------------------------------
+
+    function webGLStart() {
+        var canvas = document.getElementById("glcanvas");
+        initGL(canvas);
+
+        loadTextures();
+        initShaders();
+        initBuffers();
+        
+
+        gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        gl.enable(gl.DEPTH_TEST);
+
+        requestAnimFrame( drawScene );
+    }
+
+
+</script>
+
+
+</head>
+
+
+<body onload="webGLStart();">
+
+    <canvas id="glcanvas" style="border: none;" width="500" height="500"></canvas>
+
+ 
+</body>
+
+</html>
