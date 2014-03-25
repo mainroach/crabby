@@ -279,18 +279,18 @@ void writeMetaDataJSON(std::string outPrefix,  const eCompressionMode compressio
 	FILE* pOut = fopen(outName,"wt");
 
 	fwriteTextVA(pOut,"{");
-	fwriteTextVA(pOut,"\"compressionMode\":\"%i\",\n",compressionMode);
+	fwriteTextVA(pOut,"\"compressionMode\":%i,\n",compressionMode);
 	
 
-	fwriteTextVA(pOut,"\"blockSize\":\"%i\",\n",cBlockSize);
-	fwriteTextVA(pOut,"\"palleteWidth\":\"%i\",\n",palleteWidth);
-	fwriteTextVA(pOut,"\"palleteHeight\":\"%i\",\n",palleteHeight);
+	fwriteTextVA(pOut,"\"blockSize\":%i,\n",cBlockSize);
+	fwriteTextVA(pOut,"\"palleteWidth\":%i,\n",palleteWidth);
+	fwriteTextVA(pOut,"\"palleteHeight\":%i,\n",palleteHeight);
 
 
     const uint32 numFrames = frames.size();
-	 fwriteTextVA(pOut,"\"numFrames\":\"%i\",\n",numFrames);
-	 fwriteTextVA(pOut,"\"frameTexWidth\":\"%i\",\n",frameTexWidth);
-	 fwriteTextVA(pOut,"\"frameTexHeight\":\"%i\",\n",frameTexHeight);
+	 fwriteTextVA(pOut,"\"numFrames\":%i,\n",numFrames);
+	 fwriteTextVA(pOut,"\"frameTexWidth\":%i,\n",frameTexWidth);
+	 fwriteTextVA(pOut,"\"frameTexHeight\":%i,\n",frameTexHeight);
 
 	 fwriteTextVA(pOut,"\"frames\":[\n",frameTexHeight);
 
@@ -310,12 +310,12 @@ void writeMetaDataJSON(std::string outPrefix,  const eCompressionMode compressio
         const float heightScale = (frames[i].srcImgHeight / cBlockSize) / (float)frameTexHeight;
         
 		  //write out our frame data to the file
-		  fwriteTextVA(pOut,"\"srcImgWidth\":\"%i\",\n\t",frames[i].srcImgWidth);
-		  fwriteTextVA(pOut,"\"srcImgHeight\":\"%i\",\n\t",frames[i].srcImgHeight);
-		  fwriteTextVA(pOut,"\"xOffset\":\"%f\",\n\t",xOffset);
-		  fwriteTextVA(pOut,"\"yOffset\":\"%f\",\n\t",yOffset);
-		  fwriteTextVA(pOut,"\"widthScale\":\"%f\",\n\t",widthScale);
-		  fwriteTextVA(pOut,"\"heightScale\":\"%f\"\n",heightScale);
+		  fwriteTextVA(pOut,"\"srcImgWidth\":%i,\n\t",frames[i].srcImgWidth);
+		  fwriteTextVA(pOut,"\"srcImgHeight\":%i,\n\t",frames[i].srcImgHeight);
+		  fwriteTextVA(pOut,"\"xOffset\":%f,\n\t",xOffset);
+		  fwriteTextVA(pOut,"\"yOffset\":%f,\n\t",yOffset);
+		  fwriteTextVA(pOut,"\"widthScale\":%f,\n\t",widthScale);
+		  fwriteTextVA(pOut,"\"heightScale\":%f\n",heightScale);
 
 		  fwriteTextVA(pOut,"\t}\n");
 	 }
