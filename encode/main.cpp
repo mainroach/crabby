@@ -26,7 +26,7 @@ BLOCK-PALLETE ANIMATED TEXTURE COMPRESSION
 static int print_usage()
 {
    printf("Description: Crabby.\n");
-   printf("Usage: encode.exe txtfilename outfileprefix\n");
+   printf("Usage: encode.exe txtfilename outfileprefix <options>\n");
    return EXIT_FAILURE;
 }
 //-----------------------------------
@@ -84,7 +84,21 @@ int main(int argc, char *argv[])
 
 	char* inFile = argv[1];	// The text file listing what loose assets to load
 	char* outFile = argv[2]; //the out filename prefix to use <blah>.tga, <blah>.frame
+
 	eCompressionMode comprMode = cMode_A;
+	eOutputMetaDataMode metaOutputMode =eMetaMode_Binary;
+
+	if(argc >2)
+	{
+		for(int i =3; i < argc; i++)
+		{
+			if(!stricmp("-JSON",argv[i]))
+			{
+				metaOutputMode=eMetaMode_JSON;
+			}
+		}
+	}
+	
 
 	//read the input file
 
@@ -113,7 +127,7 @@ int main(int argc, char *argv[])
 	delete[] pFileDat;
 
 	
-	compressFlipbook(images,outFile, comprMode);
+	compressFlipbook(images,outFile, comprMode, metaOutputMode);
 
 
 	

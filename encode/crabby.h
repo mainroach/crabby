@@ -59,7 +59,12 @@ enum eCompressionMode
     cMode_A =0, //mode 0 = 16 bit indicies everywhere
 };
 
-
+// output metadata formats
+enum eOutputMetaDataMode
+{
+	eMetaMode_Binary =0,
+	eMetaMode_JSON,
+};
 
 
 
@@ -69,6 +74,6 @@ struct Block
     RGBAColor pixels[16]; //assumes 4x4 pixels, raster order
 };
 
-void compressFlipbook(std::vector<std::string>& filenameList, std::string outPrefix,const eCompressionMode compressionMode);
+void compressFlipbook(std::vector<std::string>& filenameList, std::string outPrefix,const eCompressionMode compressionMode, const eOutputMetaDataMode outputMode);
 
 

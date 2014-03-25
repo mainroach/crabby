@@ -257,6 +257,76 @@ void writeBlockPallete(std::string outPrefix, std::vector<Block>& blockPool,uint
     
 }
 //----------------------------------------------
+
+static void fwriteTextVA(FILE* pfile,const char* pMsg, ...)
+{
+   va_list args;
+   va_start(args, pMsg);
+   char buf[512];
+   vsprintf(buf, pMsg, args);
+   va_end(args);
+   fwrite(buf,strlen(buf),1,pfile);
+}
+//----------------------------------------------
+void writeMetaDataJSON(std::string outPrefix,  const eCompressionMode compressionMode, std::vector<ControlFrame>& frames,const uint32 palleteWidth, const uint32 palleteHeight, 
+                                 const uint32 frameTexWidth, const uint32 frameTexHeight)
+{
+
+	char outName[512];
+	sprintf(outName,"%s_metadata.json",outPrefix.c_str());
+	
+	
+	FILE* pOut = fopen(outName,"wt");
+
+	fwriteTextVA(pOut,"{");
+	fwriteTextVA(pOut,"\"compressionMode\":\"%i\",\n",compressionMode);
+	
+
+	fwriteTextVA(pOut,"\"blockSize\":\"%i\",\n",cBlockSize);
+	fwriteTextVA(pOut,"\"palleteWidth\":\"%i\",\n",palleteWidth);
+	fwriteTextVA(pOut,"\"palleteHeight\":\"%i\",\n",palleteHeight);
+
+
+    const uint32 numFrames = frames.size();
+	 fwriteTextVA(pOut,"\"numFrames\":\"%i\",\n",numFrames);
+	 fwriteTextVA(pOut,"\"frameTexWidth\":\"%i\",\n",frameTexWidth);
+	 fwriteTextVA(pOut,"\"frameTexHeight\":\"%i\",\n",frameTexHeight);
+
+	 fwriteTextVA(pOut,"\"frames\":[\n",frameTexHeight);
+
+    // per frame, write out the data from the atlas packer
+    for(uint32 i =0; i < frames.size();i++)
+    {
+		 if(i ==0) fwriteTextVA(pOut,"\t{\n");
+		 else fwriteTextVA(pOut,",\t{\n");
+
+		 fwriteTextVA(pOut,"\"srcImageName\":\"%s\",\n\t",frames[i].srcImageName);
+
+
+        //CALCULATE WHAT OUR UV COORDINATES WILL BE!
+        const float xOffset = frames[i].atlasLocX / (float)frameTexWidth;
+        const float yOffset = frames[i].atlasLocY / (float)frameTexHeight;
+        const float widthScale = (frames[i].srcImgWidth / cBlockSize) / (float)frameTexWidth;
+        const float heightScale = (frames[i].srcImgHeight / cBlockSize) / (float)frameTexHeight;
+        
+		  //write out our frame data to the file
+		  fwriteTextVA(pOut,"\"srcImgWidth\":\"%i\",\n\t",frames[i].srcImgWidth);
+		  fwriteTextVA(pOut,"\"srcImgHeight\":\"%i\",\n\t",frames[i].srcImgHeight);
+		  fwriteTextVA(pOut,"\"xOffset\":\"%f\",\n\t",xOffset);
+		  fwriteTextVA(pOut,"\"yOffset\":\"%f\",\n\t",yOffset);
+		  fwriteTextVA(pOut,"\"widthScale\":\"%f\",\n\t",widthScale);
+		  fwriteTextVA(pOut,"\"heightScale\":\"%f\"\n",heightScale);
+
+		  fwriteTextVA(pOut,"\t}\n");
+	 }
+	 fwriteTextVA(pOut,"]",frameTexHeight);
+
+	 fwriteTextVA(pOut,"}\n");
+	
+
+	fclose(pOut);
+}
+//----------------------------------------------
 void writeMetaDataBinary(std::string outPrefix,  const eCompressionMode compressionMode, std::vector<ControlFrame>& frames,const uint32 palleteWidth, const uint32 palleteHeight, 
                                  const uint32 frameTexWidth, const uint32 frameTexHeight)
 {
@@ -421,7 +491,7 @@ int compressFramesModeA(std::vector<std::string>& filenames, std::vector<Block>&
 }
 
 //----------------------------------------------
-void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix, const eCompressionMode compressionMode)
+void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix, const eCompressionMode compressionMode, const eOutputMetaDataMode outputMode)
 {
 	uint32 numBlocks=0;
 	uint32 imgDeltaWidth=0;
@@ -446,6 +516,8 @@ void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix
 	// Block pallet is the unique set of blocks used by this image, stored in RGBA8
    writeBlockPallete(outPrefix, globalBlockPool,numBlocks,imgDeltaWidth,imgDeltaHeight);
 	// The metadata binary contains information on where the frames are, and how to render them
-	// Note, this could be JSON, XML, or whatever. I chose binary because it was the easiest to code, and produced the smallest output footprint.
-   writeMetaDataBinary(outPrefix, compressionMode, frames, imgDeltaWidth, imgDeltaHeight, controlAtlasWidth,controlAtlasHeight);
+	if(outputMode == eMetaMode_Binary)
+		writeMetaDataBinary(outPrefix, compressionMode, frames, imgDeltaWidth, imgDeltaHeight, controlAtlasWidth,controlAtlasHeight);
+	else if(outputMode == eMetaMode_JSON)
+		writeMetaDataJSON(outPrefix, compressionMode, frames, imgDeltaWidth, imgDeltaHeight, controlAtlasWidth,controlAtlasHeight);
 }
