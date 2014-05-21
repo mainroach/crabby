@@ -482,7 +482,7 @@ void demo_render( void )
 	
 	const unsigned int frameCounter = gFlipObj.currentFrame;
 	const unsigned char cBlockSize = 4;
-	glUniform4f(constantsVec4Loc,cBlockSize,256/cBlockSize,0,0);
+	glUniform4f(constantsVec4Loc,cBlockSize,floor(256.0f/cBlockSize),0,0);
 	glUniform4f(frameDataVec4Loc,	gFlipObj.frames[frameCounter].uvOffsetX,
 												gFlipObj.frames[frameCounter].uvOffsetY,
 												gFlipObj.frames[frameCounter].rcpWidth,

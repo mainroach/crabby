@@ -20,11 +20,11 @@
     void main( void )
     {
         //consts
-        float cBlockSize = floor(constants.x);
+        float cBlockSize = (constants.x);
         float cMaxBlocksWidth= constants.y;
 
         //per flipbook, computed on CPU
-        float minPalleteOffset = floor(constants.z);
+        float minPalleteOffset = (constants.z);
         vec2 frameSize = atlasData.xy;
         vec2 atlasSizes = atlasData.zw;
 
@@ -37,14 +37,14 @@
 
         vec2 idxSepr = texture2D( framesTexture, controlUV ).ab;
         float deltaBlockIndex=  floor(idxSepr.x*256.0)*256.0 + floor(idxSepr.y*256.0); 
-        deltaBlockIndex = floor(deltaBlockIndex );//it's a 16 bit input
+        
         
        
         
         //WHAT IS THE SOURCE-BLOCK-INDEX
         //given deltaBlockIndex, determine what the right srcPxlIdx is
         
-        vec2 bloc = vec2(   floor(mod(deltaBlockIndex , cMaxBlocksWidth)), 
+        vec2 bloc = vec2(   (mod(deltaBlockIndex , cMaxBlocksWidth)), 
                             floor(deltaBlockIndex / cMaxBlocksWidth)
                         );
         vec2 blocpx = vec2(floor(mod(pixel.x , cBlockSize)), 
@@ -451,7 +451,7 @@
         //set the params
         var frameCounter = gFlipObj.currentFrame;
         var cBlockSize = gFlipObj.meta.blockSize;
-        gl.uniform4f(shaderProgram.constantsVec4Loc, cBlockSize,256/cBlockSize,0,0);
+        gl.uniform4f(shaderProgram.constantsVec4Loc, cBlockSize,Math.floor(256/cBlockSize),0,0);
         gl.uniform4f(shaderProgram.frameDataVec4Loc,   gFlipObj.meta.frames[frameCounter].xOffset,
                                                     gFlipObj.meta.frames[frameCounter].yOffset,
                                                     gFlipObj.meta.frames[frameCounter].widthScale,

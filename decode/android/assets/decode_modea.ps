@@ -11,11 +11,11 @@ uniform vec4 atlasData; //frame.imgWidth,frame.imgHeight, pallete.width,pallete.
 void main( void )
 {
     //consts
-    float cBlockSize = floor(constants.x);
+    float cBlockSize = (constants.x);
     float cMaxBlocksWidth= constants.y;
 
     //per flipbook, computed on CPU
-    float minPalleteOffset = floor(constants.z);
+    float minPalleteOffset = (constants.z);
     vec2 frameSize = atlasData.xy;
     vec2 atlasSizes = atlasData.zw;
 
@@ -28,13 +28,12 @@ void main( void )
 
     vec2 idxSepr = texture2D( framesTexture, controlUV ).ab;
     float deltaBlockIndex=  floor(idxSepr.x*256.0)*256.0 + floor(idxSepr.y*256.0); 
-    deltaBlockIndex = floor(deltaBlockIndex );//it's a 16 bit input
     
     
     //WHAT IS THE SOURCE-BLOCK-INDEX
     //given deltaBlockIndex, determine what the right srcPxlIdx is
     
-    vec2 bloc = vec2(   floor(mod(deltaBlockIndex , cMaxBlocksWidth)), 
+    vec2 bloc = vec2(   (mod(deltaBlockIndex , cMaxBlocksWidth)), 
                         floor(deltaBlockIndex / cMaxBlocksWidth)
                     );
     vec2 blocpx = vec2(floor(mod(pixel.x , cBlockSize)), 
