@@ -178,6 +178,26 @@
 	<References>
 	</References>
 	<Files>
+		<Filter
+			Name="textures"
+			>
+			<File
+				RelativePath="..\imgHelper.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\imgHelper.h"
+				>
+			</File>
+			<File
+				RelativePath="..\lodepng.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\lodepng.h"
+				>
+			</File>
+		</Filter>
 		<File
 			RelativePath="..\binPacking.cpp"
 			>
@@ -192,14 +212,6 @@
 		</File>
 		<File
 			RelativePath="..\crabby.h"
-			>
-		</File>
-		<File
-			RelativePath="..\imgHelper.cpp"
-			>
-		</File>
-		<File
-			RelativePath="..\imgHelper.h"
 			>
 		</File>
 		<File
