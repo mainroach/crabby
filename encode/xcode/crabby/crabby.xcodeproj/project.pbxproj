@@ -1,0 +1,248 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9C4FD5B318D497AD00D56115 /* crabby.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = 9C4FD5B218D497AD00D56115 /* crabby.1 */; };
+		9C4FD5C018D497DC00D56115 /* binPacking.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4FD5B918D497DC00D56115 /* binPacking.cpp */; };
+		9C4FD5C118D497DC00D56115 /* crabby.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4FD5BB18D497DC00D56115 /* crabby.cpp */; };
+		9C4FD5C218D497DC00D56115 /* imgHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4FD5BD18D497DC00D56115 /* imgHelper.cpp */; };
+		9C4FD5C318D497DC00D56115 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9C4FD5BF18D497DC00D56115 /* main.cpp */; };
+		9CA70542192D64B00099023C /* lodepng.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9CA70540192D64B00099023C /* lodepng.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9C4FD5AB18D497AD00D56115 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				9C4FD5B318D497AD00D56115 /* crabby.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9C4FD5AD18D497AD00D56115 /* crabby */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = crabby; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C4FD5B218D497AD00D56115 /* crabby.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = crabby.1; sourceTree = "<group>"; };
+		9C4FD5B918D497DC00D56115 /* binPacking.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = binPacking.cpp; path = ../../../binPacking.cpp; sourceTree = "<group>"; };
+		9C4FD5BA18D497DC00D56115 /* binPacking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = binPacking.h; path = ../../../binPacking.h; sourceTree = "<group>"; };
+		9C4FD5BB18D497DC00D56115 /* crabby.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = crabby.cpp; path = ../../../crabby.cpp; sourceTree = "<group>"; };
+		9C4FD5BC18D497DC00D56115 /* crabby.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crabby.h; path = ../../../crabby.h; sourceTree = "<group>"; };
+		9C4FD5BD18D497DC00D56115 /* imgHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = imgHelper.cpp; path = ../../../imgHelper.cpp; sourceTree = "<group>"; };
+		9C4FD5BE18D497DC00D56115 /* imgHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = imgHelper.h; path = ../../../imgHelper.h; sourceTree = "<group>"; };
+		9C4FD5BF18D497DC00D56115 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../../main.cpp; sourceTree = "<group>"; };
+		9CA70540192D64B00099023C /* lodepng.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lodepng.cpp; path = ../../../lodepng.cpp; sourceTree = "<group>"; };
+		9CA70541192D64B00099023C /* lodepng.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lodepng.h; path = ../../../lodepng.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9C4FD5AA18D497AD00D56115 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9C4FD5A418D497AD00D56115 = {
+			isa = PBXGroup;
+			children = (
+				9C4FD5AF18D497AD00D56115 /* crabby */,
+				9C4FD5AE18D497AD00D56115 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9C4FD5AE18D497AD00D56115 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9C4FD5AD18D497AD00D56115 /* crabby */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9C4FD5AF18D497AD00D56115 /* crabby */ = {
+			isa = PBXGroup;
+			children = (
+				9C4FD5B918D497DC00D56115 /* binPacking.cpp */,
+				9CA70540192D64B00099023C /* lodepng.cpp */,
+				9CA70541192D64B00099023C /* lodepng.h */,
+				9C4FD5BA18D497DC00D56115 /* binPacking.h */,
+				9C4FD5BB18D497DC00D56115 /* crabby.cpp */,
+				9C4FD5BC18D497DC00D56115 /* crabby.h */,
+				9C4FD5BD18D497DC00D56115 /* imgHelper.cpp */,
+				9C4FD5BE18D497DC00D56115 /* imgHelper.h */,
+				9C4FD5BF18D497DC00D56115 /* main.cpp */,
+				9C4FD5B218D497AD00D56115 /* crabby.1 */,
+			);
+			path = crabby;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9C4FD5AC18D497AD00D56115 /* crabby */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9C4FD5B618D497AD00D56115 /* Build configuration list for PBXNativeTarget "crabby" */;
+			buildPhases = (
+				9C4FD5A918D497AD00D56115 /* Sources */,
+				9C4FD5AA18D497AD00D56115 /* Frameworks */,
+				9C4FD5AB18D497AD00D56115 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = crabby;
+			productName = crabby;
+			productReference = 9C4FD5AD18D497AD00D56115 /* crabby */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9C4FD5A518D497AD00D56115 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Colt McAnlis";
+			};
+			buildConfigurationList = 9C4FD5A818D497AD00D56115 /* Build configuration list for PBXProject "crabby" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 9C4FD5A418D497AD00D56115;
+			productRefGroup = 9C4FD5AE18D497AD00D56115 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9C4FD5AC18D497AD00D56115 /* crabby */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9C4FD5A918D497AD00D56115 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C4FD5C018D497DC00D56115 /* binPacking.cpp in Sources */,
+				9C4FD5C118D497DC00D56115 /* crabby.cpp in Sources */,
+				9C4FD5C218D497DC00D56115 /* imgHelper.cpp in Sources */,
+				9C4FD5C318D497DC00D56115 /* main.cpp in Sources */,
+				9CA70542192D64B00099023C /* lodepng.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		9C4FD5B418D497AD00D56115 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		9C4FD5B518D497AD00D56115 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		9C4FD5B718D497AD00D56115 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = ../../../bin;
+			};
+			name = Debug;
+		};
+		9C4FD5B818D497AD00D56115 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = ../../../bin;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9C4FD5A818D497AD00D56115 /* Build configuration list for PBXProject "crabby" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C4FD5B418D497AD00D56115 /* Debug */,
+				9C4FD5B518D497AD00D56115 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9C4FD5B618D497AD00D56115 /* Build configuration list for PBXNativeTarget "crabby" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C4FD5B718D497AD00D56115 /* Debug */,
+				9C4FD5B818D497AD00D56115 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 9C4FD5A518D497AD00D56115 /* Project object */;
+}

@@ -100,15 +100,15 @@ int main(int argc, char *argv[])
 	{
 		for(int i =3; i < argc; i++)
 		{
-			if(!stricmp("-JSON",argv[i]))
+			if(!strcmp("-JSON",argv[i]))
 			{
 				metaOutputMode=eMetaMode_JSON;
 			}
-			else if(!stricmp("-block_tga",argv[i]))
+			else if(!strcmp("-block_tga",argv[i]))
 			{
 				outImageMode=eImageMode_Tga;
 			}
-			else if(!stricmp("-block_raw",argv[i]))
+			else if(!strcmp("-block_raw",argv[i]))
 			{
 				outImageMode=eImageMode_Raw;
 			}
