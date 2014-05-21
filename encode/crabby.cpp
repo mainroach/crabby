@@ -160,13 +160,15 @@ void generateControlAtlasUVs(std::vector<ControlFrame>& frames, const uint32 max
     outAtlasHeight = roundUp(outAtlasHeight,4);
     
 };
+
 //----------------------------------------------
 void writeControlAtlas(std::string outPrefix,std::vector<ControlFrame>& frames, uint32& atlasWidth,uint32& atlasHeight)
 {
     // first, generate the UV locations where the frames will be written to the file.
     generateControlAtlasUVs(frames,4096,4096,atlasWidth,atlasHeight);
 
-    
+
+
    //for each of our control frames, we need to write the data into the larger atlas object
 	 // go ahead and allocate the object. NOTE we're using mode A here, so everything is 16 bit indexes :(
     uint16* pAtlas = new uint16[atlasWidth * atlasHeight];
@@ -187,7 +189,9 @@ void writeControlAtlas(std::string outPrefix,std::vector<ControlFrame>& frames, 
             memcpy(&pAtlas[dstIdx],&(frames[i].blockIdx[q * numXBlocks]), numXBlocks * sizeof(uint16));
         }
     }
-    
+   
+
+
     //write to disk
 	 char outPath[1024];
 	 sprintf(outPath,"%s_frames.raw",outPrefix.c_str());
@@ -200,11 +204,12 @@ void writeControlAtlas(std::string outPrefix,std::vector<ControlFrame>& frames, 
     fprintf(stderr,"\nframes.raw:%i",sizeof(uint16)*atlasWidth*atlasHeight);
     delete[] pAtlas;
 }
+
 //----------------------------------------------
 void writeBlockPallete(std::string outPrefix, std::vector<Block>& blockPool,uint32& numBlocks, uint32& imgDeltaWidth, uint32& imgDeltaHeight, const eOutputImageMode imageMode)
 {
     // This function will write our our RGBA blocks in a pallet form.
-    
+
     const uint32 cMaxBlocksWidth = cMaxAtlasWidth / cBlockSize;
     
 	 // some simple math here to determine what the X/Y of our out pallete will  be, given our block inputs
@@ -442,24 +447,18 @@ void paddImageCanvas(ImageData& imgDat)
 //----------------------------------------------
 int compressFramesModeA(std::vector<std::string>& filenames, std::vector<Block>& blockPool, std::vector<ControlFrame>& frames,uint32& numBlocks, uint32& imgDeltaWidth)
 {
-    //generate each control frame
-    for(uint32 i =0; i < filenames.size();i++)
-    {
+	//generate each control frame
+	for(uint32 i =0; i < filenames.size();i++)
+	{
 		// Load our image data into memory, getting an RGBA texture
       ImageData imgA;
-		if(-1 != filenames[i].find(".tga"))
+		
+		if(!loadTexture(filenames[i].c_str(), imgA))
 		{
-			if(!loadTGAFile(filenames[i].c_str(), imgA))
-			{
-				fprintf(stderr,"\n ERROR could not load image %s\n\n",filenames[i].c_str());
-				return -1;
-			}
-		}
-		else
-		{
-			fprintf(stderr,"\n Sorry, this build can only load .tga files\n\n");
+			fprintf(stderr,"\n ERROR could not load image %s\n\n",filenames[i].c_str());
 			return -1;
 		}
+		
 
 
 

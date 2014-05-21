@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 #include <vector>
 #include "imgHelper.h"
 #include "crabby.h"
+// Forward decl, for sanity.
+int loadPNGFile(const char* pFilename, ImageData& id);
 
 
 struct TGAHeader {
@@ -60,11 +62,11 @@ bool loadTGAFile(const char* pFilename, ImageData& id)
 	//grab our with, height, and bits per pixel
 	id.width  = header.width;
 	id.height = header.height;
-	const unsigned char outBPP	= header.bitsperpixel; // we expect RGBA?
+	id.bpp	= header.bitsperpixel; // we expect RGBA?
 	id.imgSizeInBytes = id.width * id.height * 4;
 
 	// Compute the number of BYTES per pixel
-	const unsigned int bytesPerPixel	= (outBPP / 8);
+	const unsigned int bytesPerPixel	= (id.bpp / 8);
 	// Compute the total amout ofmemory needed to store data
 	const unsigned int imageSize		= (bytesPerPixel * id.width * id.height);
 
@@ -172,4 +174,19 @@ void saveTGA(const char* pFilename,RGBAColor* pOutImage, const unsigned int outW
 	}
 	//fwrite(pOutImage, sizeof(RGBAColor)*outWidth*outHeight,1,  f);
 	fclose(f);
+}
+
+
+
+
+int loadTexture(const char* pFilename, ImageData& id)
+{
+	const char* ext = strrchr(pFilename,'.');
+	if(!strcmp(ext,".tga") || !strcmp(ext,".TGA"))
+		return loadTGAFile( pFilename,  id);
+	else if(!strcmp(ext,".png") || !strcmp(ext,".PNG"))
+		return 0==loadPNGFile(pFilename,  id);
+
+	fprintf(stderr,"\nSorry bro, unregonized image format not supported");
+	return -1;
 }

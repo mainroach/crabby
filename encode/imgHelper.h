@@ -27,7 +27,7 @@ struct ImageData
 	unsigned int height;
 	char* pImgData;
 	unsigned int imgSizeInBytes;
-	unsigned char imgFormat;
+	unsigned char bpp;
 };
 
 struct RGBAColor
@@ -38,5 +38,5 @@ struct RGBAColor
 	unsigned char a;
 };
 
-bool loadTGAFile(const char* pFilename, ImageData& id);
 void saveTGA(const char* pFilename, RGBAColor* pOutImage, const unsigned int outWidth, const unsigned int outHeight);
+int loadTexture(const char* pFilename, ImageData& id);
