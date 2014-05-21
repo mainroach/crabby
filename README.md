@@ -30,3 +30,11 @@ The compression performance of Crabby is based entirely on how much duplicate 4x
 ## What type of performance hit does Crabby cause? ##
 Pretty well, actually. The largest (potential) bottleneck comes from the dependent texture read.  For desktop hardware, this fetch is negligable (webGL, modern desktop ,console GPUs easily eat this up). For mobile hardware, this entirely depends on your GPU. We've seen some performance concerns on older tiling architectures, and low-cost GPUs.
 [results document](https://docs.google.com/document/d/1Zvn98TA5QRZIf6lZ5HqrHrBWJi7zkeo9UWIruJuUqdc/edit) will contain more benchmark tests as they are run and provided. 
+
+## How should I use Crabby? ##
+Crabby is best used by providing individual, un-atlased textures to it that share some commonality. Crabby will index, reference, and atlas-pack these loose textures on your behalf, and provide to you all the data you need for the decoder. 
+Technically speaking, Crabby will work on already packed images (you can just pass it an atlas) however the savings in this process will not be as good as the loose textures. The reason for this behavior is straightforward:
+ * Charts in atlases have often been rotated, or flipped in order to produce a better atlas packing.
+ * Charts in an atlas may not obey alignments in the same way. For example, two 128x128 images will roughly share the same 4x4 blocks. However when they are atlases, one might be shifted by a pixel, meaning that it will have completly unique 4x4 blocks.
+
+The take-away from this is that running Crabby on a single atlas will work, although the savings will not be as great compared to running each chart of the atlas through crabby solo.
