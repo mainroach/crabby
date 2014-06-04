@@ -79,6 +79,7 @@ struct Block
     RGBAColor pixels[16]; //assumes 4x4 pixels, raster order
 };
 
+
 void compressFlipbook(std::vector<std::string>& filenameList, std::string outPrefix,
 							 const eCompressionMode compressionMode, 
 							 const eOutputMetaDataMode outputMode,

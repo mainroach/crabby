@@ -177,16 +177,19 @@ void writeControlAtlas(std::string outPrefix,std::vector<ControlFrame>& frames, 
     uint32 yOffset = 0;
     for(uint32 i = 0; i < frames.size();i++)
     {
-        xOffset = frames[i].atlasLocX;
-        yOffset = frames[i].atlasLocY;
-        const uint32 numXBlocks = frames[i].srcImgWidth / cBlockSize;
-        const uint32 numYBlocks = frames[i].srcImgHeight / cBlockSize;
-
+		  ControlFrame* pFrame = &frames[i];
+        xOffset = pFrame->atlasLocX;
+        yOffset = pFrame->atlasLocY;
+        const uint32 numXBlocks = pFrame->srcImgWidth / cBlockSize;
+        const uint32 numYBlocks = pFrame->srcImgHeight / cBlockSize;
+		  std::vector<unsigned short> &pBlock = frames[i].blockIdx;
         //copy in this block at this location
-        for(uint8 q=0; q < numYBlocks; q++)
+        for(uint32 q=0; q < numYBlocks; q++)
         {
             const uint32 dstIdx = (((yOffset+q) * atlasWidth) + xOffset);
-            memcpy(&pAtlas[dstIdx],&(frames[i].blockIdx[q * numXBlocks]), numXBlocks * sizeof(uint16));
+				void* pDest = &pAtlas[dstIdx];
+				void* pSrc = &(pBlock[q * numXBlocks]);
+            memcpy(pDest,pSrc, numXBlocks * sizeof(uint16));
         }
     }
    
@@ -386,10 +389,83 @@ void writeMetaDataBinary(std::string outPrefix,  const eCompressionMode compress
     fclose(pFile);
 
 }
+//This is a murmur hash, taken from http://en.wikipedia.org/wiki/MurmurHash
+unsigned int murmur3_32(const char *key, unsigned int len, unsigned int seed) {
+	static const unsigned int c1 = 0xcc9e2d51;
+	static const unsigned int c2 = 0x1b873593;
+	static const unsigned int r1 = 15;
+	static const unsigned int r2 = 13;
+	static const unsigned int m = 5;
+	static const unsigned int n = 0xe6546b64;
+ 
+	unsigned int hash = seed;
+ 
+	const int nblocks = len / 4;
+	const unsigned int *blocks = (const unsigned int *) key;
+	int i;
+	for (i = 0; i < nblocks; i++) {
+		unsigned int k = blocks[i];
+		k *= c1;
+		k = (k << r1) | (k >> (32 - r1));
+		k *= c2;
+ 
+		hash ^= k;
+		hash = ((hash << r2) | (hash >> (32 - r2))) * m + n;
+	}
+ 
+	const unsigned char *tail = (const unsigned char *) (key + nblocks * 4);
+	unsigned int k1 = 0;
+ 
+	switch (len & 3) {
+	case 3:
+		k1 ^= tail[2] << 16;
+	case 2:
+		k1 ^= tail[1] << 8;
+	case 1:
+		k1 ^= tail[0];
+ 
+		k1 *= c1;
+		k1 = (k1 << r1) | (k1 >> (32 - r1));
+		k1 *= c2;
+		hash ^= k1;
+	}
+ 
+	hash ^= len;
+	hash ^= (hash >> 16);
+	hash *= 0x85ebca6b;
+	hash ^= (hash >> 13);
+	hash *= 0xc2b2ae35;
+	hash ^= (hash >> 16);
+ 
+	return hash;
+}
+#include <map>
+struct BlockPool
+{
+	std::vector<Block> pool;
+	std::map<unsigned int, unsigned int> blockHashMap;
+};
 
 //----------------------------------------------
-int addBlockToPool(std::vector<Block>& blockPool,Block& block)
+int addBlockToPool(BlockPool& pool,Block& block)
 {
+	const unsigned int hashkey = murmur3_32((char*)block.pixels,sizeof(RGBAColor)*16,0xFF);
+	std::pair<unsigned int, unsigned int> searchBlock;
+
+	const unsigned int ct = pool.blockHashMap.count(hashkey);
+	if(ct==0)
+	{
+		//Block doesn't currently exist in the pool, add it
+		pool.blockHashMap.insert(std::pair<unsigned int, unsigned int>(hashkey,pool.pool.size()));
+		pool.pool.push_back(block);
+		return pool.pool.size()-1;
+	}
+	
+	
+	//block exists in the pool, return the index
+	return pool.blockHashMap[hashkey];
+	
+/*
     //is there an identitical block of this type somewhere?
     for(uint32 i =0; i < blockPool.size();i++)
     {
@@ -404,6 +480,7 @@ int addBlockToPool(std::vector<Block>& blockPool,Block& block)
     blockPool.push_back(block);
     //NOTE this has to be offset by 1!
     return blockPool.size()-1;
+	 */
 }
 
 //----------------------------------------------
@@ -445,7 +522,7 @@ void paddImageCanvas(ImageData& imgDat)
 
 }
 //----------------------------------------------
-int compressFramesModeA(std::vector<std::string>& filenames, std::vector<Block>& blockPool, std::vector<ControlFrame>& frames,uint32& numBlocks, uint32& imgDeltaWidth)
+int compressFramesModeA(std::vector<std::string>& filenames, BlockPool& blockPool, std::vector<ControlFrame>& frames,uint32& numBlocks, uint32& imgDeltaWidth)
 {
 	//generate each control frame
 	for(uint32 i =0; i < filenames.size();i++)
@@ -503,7 +580,7 @@ void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix
 	uint32 numBlocks=0;
 	uint32 imgDeltaWidth=0;
 
-	std::vector<Block> globalBlockPool;
+	BlockPool globalBlockPool;
    std::vector<ControlFrame> frames;
    
 	// we're only supporting modeA for now. Modes B,C,D are all in research phases.
@@ -521,7 +598,7 @@ void compressFlipbook(std::vector<std::string>& filenames, std::string outPrefix
 	// The control atlas: Per frame, per block in-frame, writeout the index of the desired block.
    writeControlAtlas(outPrefix, frames,controlAtlasWidth,controlAtlasHeight);
 	// Block pallet is the unique set of blocks used by this image, stored in RGBA8
-   writeBlockPallete(outPrefix, globalBlockPool,numBlocks,imgDeltaWidth,imgDeltaHeight, imageMode);
+   writeBlockPallete(outPrefix, globalBlockPool.pool,numBlocks,imgDeltaWidth,imgDeltaHeight, imageMode);
 	// The metadata binary contains information on where the frames are, and how to render them
 	if(outputMode == eMetaMode_Binary)
 		writeMetaDataBinary(outPrefix, compressionMode, frames, imgDeltaWidth, imgDeltaHeight, controlAtlasWidth,controlAtlasHeight);

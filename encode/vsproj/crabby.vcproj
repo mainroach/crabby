@@ -142,7 +142,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="../../bin/encode.exe"
+				OutputFile="../../bin/crabby.exe"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames="libc;msvcrt"
 				GenerateDebugInformation="true"
