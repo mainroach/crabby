@@ -15,6 +15,7 @@ See the License for the specific language governing permissions and
 #include <vector>
 #include <assert.h>
 #include <stdarg.h>
+#include <map>
 #include <algorithm>
 #include <math.h>
 #include "imgHelper.h"
@@ -439,7 +440,7 @@ unsigned int murmur3_32(const char *key, unsigned int len, unsigned int seed) {
  
 	return hash;
 }
-#include <map>
+
 struct BlockPool
 {
 	std::vector<Block> pool;
@@ -447,29 +448,34 @@ struct BlockPool
 };
 
 //----------------------------------------------
-int addBlockToPool(BlockPool& pool,Block& block)
+int addBlockToPool(BlockPool& blockPool,Block& block)
 {
 	const unsigned int hashkey = murmur3_32((char*)block.pixels,sizeof(RGBAColor)*16,0xFF);
 	std::pair<unsigned int, unsigned int> searchBlock;
 
-	const unsigned int ct = pool.blockHashMap.count(hashkey);
+	const unsigned int ct = blockPool.blockHashMap.count(hashkey);
 	if(ct==0)
 	{
 		//Block doesn't currently exist in the pool, add it
-		pool.blockHashMap.insert(std::pair<unsigned int, unsigned int>(hashkey,pool.pool.size()));
-		pool.pool.push_back(block);
-		return pool.pool.size()-1;
+		blockPool.blockHashMap.insert(std::pair<unsigned int, unsigned int>(hashkey,blockPool.pool.size()));
+		blockPool.pool.push_back(block);
+		return blockPool.pool.size()-1;
 	}
 	
 	
-	//block exists in the pool, return the index
-	return pool.blockHashMap[hashkey];
+	//block exists in the pool, check if there's a collision
+	const int potIdx = blockPool.blockHashMap[hashkey];
+
+	// since we're hashing, there could be collisions, let's check to be sure.
+	const int cmp = memcmp(&(blockPool.pool[potIdx].pixels[0]),&(block.pixels[0]),sizeof(RGBAColor)*16);
+	if(cmp ==0)
+		return potIdx;
+	//we found a collision for the hash key, default to slow-as-sin search.
 	
-/*
     //is there an identitical block of this type somewhere?
-    for(uint32 i =0; i < blockPool.size();i++)
+    for(uint32 i =0; i < blockPool.pool.size();i++)
     {
-        RGBAColor* pxA = &blockPool[i].pixels[0];
+        RGBAColor* pxA = &blockPool.pool[i].pixels[0];
         RGBAColor* pxB = &block.pixels[0];
 		  //do a memcmp to determine if this is the same, exact data
         const int cmpVal = memcmp(pxA,pxB, sizeof(RGBAColor)*16);
@@ -477,10 +483,9 @@ int addBlockToPool(BlockPool& pool,Block& block)
             return i ;
     }
     
-    blockPool.push_back(block);
-    //NOTE this has to be offset by 1!
-    return blockPool.size()-1;
-	 */
+    blockPool.pool.push_back(block);
+	 return blockPool.pool.size()-1;
+	 
 }
 
 //----------------------------------------------
